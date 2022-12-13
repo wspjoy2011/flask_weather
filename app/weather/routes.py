@@ -55,7 +55,7 @@ def show_city():
         city_weather['id'] = city.id
         city_weather['city'] = city.name
         city_weather['country'] = city.country.name
-        cities_weather.append(city)
+        cities_weather.append(city_weather)
     pagination = ''
     return render_template(
         'weather/show_cities_weather.html',
