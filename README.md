@@ -1,2 +1,2 @@
-# flask_weather
+# Flask weather
 Simple weather app for students
