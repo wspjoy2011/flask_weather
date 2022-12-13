@@ -52,13 +52,16 @@ def show_city():
         if 'error' in city_weather:
             flash(city_weather['error'])
             return redirect(url_for('weather.index'))
+        city_weather['id'] = city.id
         city_weather['city'] = city.name
         city_weather['country'] = city.country.name
         cities_weather.append(city)
+    pagination = ''
     return render_template(
         'weather/show_cities_weather.html',
         title='Weather in cities',
-        cities_weather=cities_weather
+        cities_weather=cities_weather,
+        pagination=pagination
     )
 
 
