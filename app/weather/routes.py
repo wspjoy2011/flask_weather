@@ -46,14 +46,20 @@ def show_city():
     """Show added city"""
     api_key = current_app.config['WEATHER_API_KEY']
     cities = City().select()
+    cities_weather = []
     for city in cities:
         city_weather = getting_weather(city.name, api_key)
         if 'error' in city_weather:
             flash(city_weather['error'])
             return redirect(url_for('weather.index'))
+        city_weather['city'] = city.name
         city_weather['country'] = city.country.name
-        city['name'] = city.name
-    return redirect(url_for('main.index'))
+        cities_weather.append(city)
+    return render_template(
+        'weather/show_cities_weather.html',
+        title='Weather in cities',
+        cities_weather=cities_weather
+    )
 
 
 @weather.route('/add/city', methods=['POST'])
