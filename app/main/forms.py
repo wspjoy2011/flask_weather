@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, SubmitField
+from wtforms import StringField, EmailField, SubmitField, HiddenField
 from wtforms.validators import DataRequired, Length
 
 
@@ -8,6 +8,7 @@ class GenerateDataForm(FlaskForm):
 
 
 class NameForm(FlaskForm):
+    id = HiddenField('id')
     name = StringField(
         'What is your name?',
         validators=[DataRequired(), Length(3, 100)],

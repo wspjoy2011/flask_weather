@@ -51,13 +51,13 @@ def add_email():
         return redirect(url_for('main.add_email'))
 
     return render_template(
-        'main/email.html',
+        'main/add_email.html',
         title='Register user',
         form=form
     )
 
 
-@main.route('/show_emails')
+@main.route('/email/show')
 def show_emails():
     """Show user information"""
     search = False
@@ -78,7 +78,53 @@ def show_emails():
     )
 
 
-@main.route('/delete_emails', methods=['POST'])
+@main.route('/email/edit/<int:user_id>')
+def edit_email(user_id):
+    """Edit user"""
+    user = User.select().where(User.id == user_id).first()
+    form = NameForm()
+    if not user:
+        flash(f'User with id: {user_id} not found. You can add user in this form.')
+        return redirect(url_for('main.add_email'))
+
+    form.id.data = user.id
+    form.id.label.text = ''
+    form.name.label.text = 'Edit this name'
+    form.email.label.text = 'Edit this email'
+
+    form.name.data = user.name
+    form.email.data = user.email
+    form.submit.label.text = 'Edit'
+
+    return render_template(
+        'main/edit_email.html',
+        title=f'Edit user {user.name}',
+        form=form
+    )
+
+
+@main.route('/email/update', methods=['POST'])
+def update_email():
+    """Update user from form"""
+    form = NameForm()
+    if form.validate_on_submit():
+        user_id = form.id.data
+        user_name = form.name.data
+        user_email = form.email.data
+
+        user = User.select().where(User.id == user_id).first()
+        user.name = user_name
+        user.email = user_email
+        try:
+            user.save()
+            flash(f'{user_name} updated')
+        except Exception:
+            flash(f'Email already added into database')
+
+    return redirect(url_for('main.index'))
+
+
+@main.route('/email/delete', methods=['POST'])
 def delete_emails():
     """Delete selected users"""
     if request.method == 'POST':

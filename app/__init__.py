@@ -3,6 +3,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from peewee import SqliteDatabase
+from playhouse.migrate import SqliteMigrator
 
 from app.config import config
 from app.error_handlers import page_not_found, internal_server_error
@@ -22,6 +23,8 @@ def create_app(config_name='default'):
     db = SqliteDatabase(app.config['DB_NAME'])
     database_proxy.initialize(db)
     db.create_tables([User, Country, City])
+    migrator = SqliteMigrator(db)
+    app.config['MIGRATOR'] = migrator
 
     csrf = CSRFProtect(app)
     csrf.init_app(app)

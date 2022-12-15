@@ -6,7 +6,7 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>Show user</h1>
+    <h1>Register user</h1>
 </div>
 {% include 'messages.html' %}
 
@@ -15,7 +15,6 @@
 <hr>
 {{ pagination.info }}
 {{ pagination.links }}
-
 <form action="{{ url_for('main.delete_emails') }}" method="post" id="userForm">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="table-responsive">
@@ -26,6 +25,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
+                <th scope="col">Edit</th>
             </tr>
             </thead>
             <tbody>
@@ -37,6 +37,11 @@
                 <td>{{ loop.index + pagination.skip }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
+                <td>
+                    <a href="{{ url_for('main.edit_email', user_id=user.id) }}">
+                        <button type="button" class="btn btn-info">Edit</button>
+                    </a>
+                </td>
             </tr>
             {% endfor %}
             </tbody>

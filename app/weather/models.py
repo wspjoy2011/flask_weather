@@ -1,5 +1,4 @@
 from peewee import CharField, ForeignKeyField
-
 from app.base_model import BaseModel
 
 

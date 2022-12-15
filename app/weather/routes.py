@@ -1,4 +1,5 @@
 from flask import (
+    abort,
     render_template,
     redirect,
     request,
@@ -43,25 +44,44 @@ def index():
 
 @weather.route('/show/city')
 def show_city():
-    """Show added city"""
-    api_key = current_app.config['WEATHER_API_KEY']
-    cities = City().select()
-    cities_weather = []
-    for city in cities:
-        city_weather = getting_weather(city.name, api_key)
-        if 'error' in city_weather:
-            flash(city_weather['error'])
-            return redirect(url_for('weather.index'))
-        city_weather['id'] = city.id
-        city_weather['city'] = city.name
-        city_weather['country'] = city.country.name
-        cities_weather.append(city_weather)
-    pagination = ''
+    """Show cities added into database"""
+    cities = City.select()
+
+    country_name = request.args.get('country_name')
+    if country_name:
+        country = Country.select().where(Country.name == country_name).first()
+        if country:
+            cities = country.city
+
     return render_template(
         'weather/show_cities_weather.html',
-        title='Weather in cities',
-        cities_weather=cities_weather,
-        pagination=pagination
+        title='Show cities weather',
+        cities=cities
+    )
+
+
+@weather.route('/show/city/<string:city_name>')
+def show_city_detail(city_name):
+    """Show detail about city added into database"""
+    api_key = current_app.config['WEATHER_API_KEY']
+    city_name = city_name.capitalize()
+
+    city = City.select().where(City.name == city_name).first()
+    if not city:
+        abort(404)
+
+    city_weather = getting_weather(city.name, api_key)
+    if 'error' in city_weather:
+        flash(city_weather['error'])
+        return redirect(url_for('weather.index'))
+
+    city_weather['country'] = city.country.name
+    city_weather['name'] = city.name
+
+    return render_template(
+        'weather/show_city_detail_weather.html',
+        title='Show cities weather',
+        city=city_weather
     )
 
 
@@ -71,17 +91,17 @@ def add_city():
     if request.method == 'POST':
         city = request.form.get('city').capitalize()
         country = request.form.get('country')
+        city_check = City.select().where(City.name == city).first()
+        if city_check:
+            flash(f'{city} already in database')
+            return redirect(url_for('weather.index'))
 
-        check_city = City.select().where(City.name == city).first()
-        if not check_city:
-            city_instance = City(
-                name=city,
-                country=country
-            )
-            city_instance.save()
-            flash(f'City: {city} added to db')
-        else:
-            flash(f'City: {city} already in db')
+        city_instance = City(
+            name=city,
+            country=country
+        )
+        city_instance.save()
+
+        flash(f'City: {city} added to db')
 
     return redirect(url_for('weather.index'))
-
