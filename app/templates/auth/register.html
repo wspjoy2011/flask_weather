@@ -2,7 +2,7 @@
 {% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}
-  {{ title }}
+{{ title }}
 {% endblock title %}
 
 {% block page_content %}
@@ -11,13 +11,12 @@
 </div>
 {% include 'messages.html' %}
 <div class="col-md-4">
-    <form action="{{ url_for('main.add_email') }}" method="POST">
+    <form action="{{ url_for('auth.register') }}" method="POST">
         {{ form.csrf_token }}
         {{ wtf.form_field(form.username) }}
         {{ wtf.form_field(form.email) }}
         {{ wtf.form_field(form.password) }}
         {{ wtf.form_field(form.password_repeat) }}
-        {{ wtf.form_field(form.remember_me) }}
         {{ wtf.form_field(form.submit) }}
     </form>
 </div>

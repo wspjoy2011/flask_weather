@@ -3,13 +3,11 @@ from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 from peewee import SqliteDatabase
-from playhouse.migrate import SqliteMigrator
 
 from app.config import config
 from app.error_handlers import page_not_found, internal_server_error
 from app.base_model import database_proxy
-from app.main.models import User
-from app.weather.models import Country, City
+from app.auth.utils import login_manager
 
 
 def create_app(config_name='default'):
@@ -22,9 +20,8 @@ def create_app(config_name='default'):
 
     db = SqliteDatabase(app.config['DB_NAME'])
     database_proxy.initialize(db)
-    db.create_tables([User, Country, City])
-    migrator = SqliteMigrator(db)
-    app.config['MIGRATOR'] = migrator
+
+    login_manager.init_app(app)
 
     csrf = CSRFProtect(app)
     csrf.init_app(app)
@@ -36,8 +33,10 @@ def create_app(config_name='default'):
 
     from app import main
     from app import weather
+    from app import auth
 
     app.register_blueprint(main.main)
     app.register_blueprint(weather.weather)
+    app.register_blueprint(auth.auth)
 
     return app
