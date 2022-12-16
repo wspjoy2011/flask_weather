@@ -4,7 +4,7 @@ from flask_paginate import Pagination, get_page_parameter
 
 from app.main import main
 from app.main.forms import NameForm, GenerateDataForm
-from app.main.models import User
+from app.auth.models import User
 from generate_data.main import main as generate_data
 from generate_data.data import emails_data
 from app.main.utils import parse_range_from_paginator
@@ -29,30 +29,6 @@ def index():
         'index.html',
         title='Home page',
         current_time=datetime.utcnow(),
-        form=form
-    )
-
-
-@main.route('/email', methods=['POST', 'GET'])
-def add_email():
-    """Add name and email form page"""
-    form = NameForm()
-
-    if form.validate_on_submit():
-        name = form.name.data
-        email = form.email.data
-        message = f'User with name {name} already registered'
-        if not User.select().where(User.email == email):
-            user = User(name=name, email=email)
-            user.save()
-            message = f'User with name {name} just registered'
-
-        flash(message)
-        return redirect(url_for('main.add_email'))
-
-    return render_template(
-        'main/add_email.html',
-        title='Register user',
         form=form
     )
 

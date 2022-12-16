@@ -1,11 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
-from app.main.models import User
+from app.auth.models import User
 
 
 class LoginForm(FlaskForm):
+    next = HiddenField()
     email = StringField(
         'Email',
         validators=[
