@@ -5,6 +5,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY')
     DB_NAME = os.getenv('DATABASE')
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+    CSRF = 'TEST'
 
     @staticmethod
     def init_app(app):
