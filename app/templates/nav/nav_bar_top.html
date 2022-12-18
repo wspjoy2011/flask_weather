@@ -34,6 +34,12 @@
       </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if current_user.is_authenticated %}
+            <li>
+                <a href="">
+                    <img src="{{ current_user.profile.avatar }}" alt="avatar" width="20" height="20">
+                    {{ current_user.name }}
+                </a>
+            </li>
             <li><a href="{{ url_for('auth.logout') }}">Log Out</a></li>
             {% else %}
             <li><a href="{{ url_for('auth.login') }}">Log In</a></li>

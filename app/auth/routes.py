@@ -3,7 +3,8 @@ from flask_login import login_required, logout_user, login_user, current_user
 
 from app.auth import auth
 from app.auth.forms import LoginForm, RegisterForm
-from app.auth.models import User
+from app.auth.models import User, Profile
+from app.auth.utils import get_avatar
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -41,13 +42,17 @@ def register():
     """Register login"""
     form = RegisterForm()
     if form.validate_on_submit():
+        profile = Profile(avatar=get_avatar(form.email.data.lower()))
+        profile.save()
         user = User(
-            email=form.email.data,
+            email=form.email.data.lower(),
             name=form.username.data,
             password=form.password.data,
-            role=1
+            role=1,
+            profile=profile.id
         )
         user.save()
+
         flash('You can now login.')
         return redirect(url_for('auth.login'))
     return render_template(
