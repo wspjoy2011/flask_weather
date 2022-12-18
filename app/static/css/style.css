@@ -11,3 +11,9 @@ footer {
     color: antiquewhite;
     font-weight: bolder;
 }
+
+.center-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

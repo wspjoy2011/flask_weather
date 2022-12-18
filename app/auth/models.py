@@ -1,4 +1,5 @@
-from peewee import CharField, ForeignKeyField, TextField
+import datetime
+from peewee import CharField, ForeignKeyField, TextField, DateTimeField
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
@@ -18,6 +19,7 @@ class User(BaseModel, UserMixin):
     name = CharField(max_length=100)
     email = CharField(max_length=150, unique=True, index=True)
     password_hash = CharField(max_length=128)
+    last_visit = DateTimeField(default=datetime.datetime.now)
     role = ForeignKeyField(Role, backref='users')
     profile = ForeignKeyField(Profile)
 
