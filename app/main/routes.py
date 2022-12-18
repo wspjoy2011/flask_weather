@@ -61,7 +61,7 @@ def show_emails():
 def edit_email(user_id):
     """Edit user"""
     if not check_permissions(current_user):
-        flash('You don\'t have access to edit this item.')
+        flash('You don\'t have access to edit this item.', 'error')
         return redirect(url_for('main.index'))
 
     user = User.select().where(User.id == user_id).first()
@@ -86,7 +86,7 @@ def edit_email(user_id):
     )
 
 
-@main.route('/email/update', methods=['POST'])
+@main.route('/email/update', methods=['GET', 'POST'])
 def update_email():
     """Update user from form"""
     form = NameForm()
@@ -113,7 +113,7 @@ def delete_emails():
     """Delete selected users"""
     if request.method == 'POST':
         if not check_permissions(current_user):
-            flash('You don\'t have access to edit this item.')
+            flash('You don\'t have access to edit this item.', 'error')
             return redirect(url_for('main.index'))
 
         message = 'Deleted: '

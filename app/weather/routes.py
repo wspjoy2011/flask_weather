@@ -7,6 +7,7 @@ from flask import (
     flash,
     current_app
 )
+from flask_login import login_required
 
 from app.weather import weather
 from app.weather.forms import CityForm
@@ -85,7 +86,8 @@ def show_city_detail(city_name):
     )
 
 
-@weather.route('/add/city', methods=['POST'])
+@weather.route('/add/city', methods=['GET', 'POST'])
+@login_required
 def add_city():
     """Add city to monitoring"""
     if request.method == 'POST':

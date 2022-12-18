@@ -5,3 +5,9 @@ footer {
 .dropdown:hover .dropdown-menu {
     display: block;
 }
+
+.error {
+    background-color: purple;
+    color: antiquewhite;
+    font-weight: bolder;
+}
