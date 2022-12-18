@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
+from flask_login import login_required, current_user
 
 from app.main import main
 from app.main.forms import NameForm, GenerateDataForm
@@ -8,6 +9,7 @@ from app.auth.models import User
 from generate_data.main import main as generate_data
 from generate_data.data import emails_data
 from app.main.utils import parse_range_from_paginator
+from app.auth.utils import check_permissions
 
 
 @main.route('/', methods=['POST', 'GET'])
@@ -55,8 +57,13 @@ def show_emails():
 
 
 @main.route('/email/edit/<int:user_id>')
+@login_required
 def edit_email(user_id):
     """Edit user"""
+    if not check_permissions(current_user):
+        flash('You don\'t have access to edit this item.')
+        return redirect(url_for('main.index'))
+
     user = User.select().where(User.id == user_id).first()
     form = NameForm()
     if not user:
@@ -101,9 +108,14 @@ def update_email():
 
 
 @main.route('/email/delete', methods=['POST'])
+@login_required
 def delete_emails():
     """Delete selected users"""
     if request.method == 'POST':
+        if not check_permissions(current_user):
+            flash('You don\'t have access to edit this item.')
+            return redirect(url_for('main.index'))
+
         message = 'Deleted: '
         selectors = list(map(int, request.form.getlist('selectors')))
 

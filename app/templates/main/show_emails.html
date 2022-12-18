@@ -25,6 +25,7 @@
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
+                <th scope="col">Role</th>
                 <th scope="col">Edit</th>
             </tr>
             </thead>
@@ -37,6 +38,7 @@
                 <td>{{ loop.index + pagination.skip }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
+                <td>{{ user.role.name }}</td>
                 <td>
                     <a href="{{ url_for('main.edit_email', user_id=user.id) }}">
                         <button type="button" class="btn btn-info">Edit</button>

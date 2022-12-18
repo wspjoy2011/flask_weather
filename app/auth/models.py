@@ -3,7 +3,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 from app.base_model import BaseModel
-from app.auth.utils import login_manager
 
 
 class Role(BaseModel):
@@ -28,7 +27,4 @@ class User(BaseModel, UserMixin):
         return check_password_hash(self.password_hash, password)
 
 
-@login_manager.user_loader
-def load_user(user_id):
-    """Load user"""
-    return User.select().where(User.id == int(user_id)).first()
+

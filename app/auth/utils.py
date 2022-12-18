@@ -1,4 +1,5 @@
 from flask_login import LoginManager
+from app.auth.models import User
 
 
 def create_login_manager():
@@ -8,3 +9,16 @@ def create_login_manager():
 
 
 login_manager = create_login_manager()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load user"""
+    return User.select().where(User.id == int(user_id)).first()
+
+
+def check_permissions(current_user_id):
+    user = User.select().where(User.id == current_user_id).first()
+    if user.role.name != 'admin':
+        return False
+    return True
