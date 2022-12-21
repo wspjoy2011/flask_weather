@@ -24,7 +24,7 @@
         {% for field, value in city.items() %}
             <tr>
                 <td>{{ field.capitalize() }}</td>
-                {% if field == 'icon_url' %}
+                {% if  'url' in field %}
                 <td class="bg-info"><img src="{{ value }}" alt=""></td>
                 {% else %}
                 <td>{{ value }}</td>

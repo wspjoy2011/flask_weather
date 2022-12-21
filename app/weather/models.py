@@ -6,6 +6,7 @@ from app.auth.models import User
 class Country(BaseModel):
     code = CharField(max_length=2, unique=True, index=True)
     name = CharField(max_length=100, unique=True, index=True)
+    flag = CharField(unique=True, index=True)
 
 
 class City(BaseModel):

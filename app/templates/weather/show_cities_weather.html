@@ -24,6 +24,7 @@
                 <th scope="col">#</th>
                 <th scope="col">City</th>
                 <th scope="col">Country</th>
+                <th scope="col">Flag</th>
             </tr>
             </thead>
             <tbody>
@@ -42,6 +43,9 @@
                     <a href="?country_name={{ user_city.city.country.name }}">
                         {{ user_city.city.country.name }}
                     </a>
+                </td>
+                <td>
+                    <img src="{{ user_city.city.country.flag }}">
                 </td>
             </tr>
             {% endfor %}

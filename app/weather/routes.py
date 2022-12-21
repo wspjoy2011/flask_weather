@@ -94,7 +94,7 @@ def show_city_detail(city_name):
 
     city_weather['country'] = user_city.city.country.name
     city_weather['name'] = user_city.city.name
-
+    city_weather['flag_url'] = user_city.city.country.flag
     return render_template(
         'weather/show_city_detail_weather.html',
         title='Show cities weather',
@@ -148,6 +148,7 @@ def delete_cities():
             .delete()
             .where(UserCity.user == current_user.id, UserCity.city.in_(selectors)).execute()
         )
+
         cities_to_delete = City.select().where(City.id.in_(selectors))
         for city in cities_to_delete:
             message += f'{city.name}, '

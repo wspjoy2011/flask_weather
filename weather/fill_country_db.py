@@ -30,7 +30,8 @@ def convert_data_from_json_to_db(countries: List[Dict[str, str]], path_to_db: st
     for country in countries:
         country_instance = Country(
             code=country['code'],
-            name=country['name']
+            name=country['name'],
+            flag=f'https://www.countryflagicons.com/FLAT/32/{country["code"]}.png'
         )
         country_instance.save()
 
