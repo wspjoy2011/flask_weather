@@ -7,12 +7,12 @@ from flask import (
     flash,
     current_app
 )
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from app.weather import weather
 from app.weather.forms import CityForm
 from weather.getting_weather import main as getting_weather
-from app.weather.models import Country, City
+from app.weather.models import Country, City, User, UserCity
 
 
 @weather.route('/', methods=['GET', 'POST'])
@@ -44,40 +44,56 @@ def index():
 
 
 @weather.route('/show/city')
+@login_required
 def show_city():
     """Show cities added into database"""
-    cities = City.select()
+    user_cities = (
+        UserCity
+        .select(City)
+        .join(User)
+        .switch(UserCity)
+        .join(City)
+        .where(UserCity.user == current_user.id)
+    )
 
     country_name = request.args.get('country_name')
     if country_name:
-        country = Country.select().where(Country.name == country_name).first()
-        if country:
-            cities = country.city
+        user_cities = [city for city in user_cities if city.city.country.name == country_name]
 
     return render_template(
         'weather/show_cities_weather.html',
         title='Show cities weather',
-        cities=cities
+        cities=user_cities
     )
 
 
 @weather.route('/show/city/<string:city_name>')
+@login_required
 def show_city_detail(city_name):
     """Show detail about city added into database"""
     api_key = current_app.config['WEATHER_API_KEY']
     city_name = city_name.capitalize()
 
-    city = City.select().where(City.name == city_name).first()
-    if not city:
+    user_city = (
+        UserCity
+        .select(City)
+        .join(User)
+        .where(User.id == current_user.id)
+        .switch(UserCity)
+        .join(City)
+        .where(City.name == city_name).first()
+    )
+
+    if not user_city:
         abort(404)
 
-    city_weather = getting_weather(city.name, api_key)
+    city_weather = getting_weather(user_city.city.name, api_key)
     if 'error' in city_weather:
         flash(city_weather['error'])
         return redirect(url_for('weather.index'))
 
-    city_weather['country'] = city.country.name
-    city_weather['name'] = city.name
+    city_weather['country'] = user_city.city.country.name
+    city_weather['name'] = user_city.city.name
 
     return render_template(
         'weather/show_city_detail_weather.html',
@@ -92,18 +108,48 @@ def add_city():
     """Add city to monitoring"""
     if request.method == 'POST':
         city = request.form.get('city').capitalize()
-        country = request.form.get('country')
-        city_check = City.select().where(City.name == city).first()
-        if city_check:
-            flash(f'{city} already in database')
-            return redirect(url_for('weather.index'))
 
-        city_instance = City(
-            name=city,
-            country=country
-        )
-        city_instance.save()
+        city_instance = City.select().where(City.name == city).first()
+        if not city_instance:
+            country = request.form.get('country')
+            city_instance = City(
+                name=city,
+                country=country
+            )
+            city_instance.save()
 
-        flash(f'City: {city} added to db')
+        user_city = UserCity.select().where(UserCity.user == current_user, UserCity.city == city_instance).first()
+        if user_city:
+            flash(f'City {city} already in list of user {current_user.name}')
+            return redirect(url_for('main.index'))
+
+        user_city = UserCity(user=current_user, city=city_instance)
+        user_city.save()
+
+        flash(f'City: {city} added to list of user {current_user.name}')
 
     return redirect(url_for('weather.index'))
+
+
+@weather.route('/delete/city', methods=['POST'])
+@login_required
+def delete_cities():
+    """Delete selected cities for current user"""
+    if request.method == 'POST':
+        message = 'Deleted: '
+        selectors = list(map(int, request.form.getlist('selectors')))
+
+        if not selectors:
+            flash('Nothing to delete')
+            return redirect(url_for('weather.show_city'))
+
+        (
+            UserCity
+            .delete()
+            .where(UserCity.user == current_user.id, UserCity.city.in_(selectors)).execute()
+        )
+        cities_to_delete = City.select().where(City.id.in_(selectors))
+        for city in cities_to_delete:
+            message += f'{city.name}, '
+        flash(message[:-2])
+        return redirect(url_for('weather.show_city'))

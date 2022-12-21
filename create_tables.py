@@ -1,12 +1,12 @@
 from peewee import SqliteDatabase
 
 from app.base_model import database_proxy
-from app.auth.models import User, Profile, Role
+from app.weather.models import UserCity
 
 
 db = SqliteDatabase('user.db')
 database_proxy.initialize(db)
-db.create_tables([Profile, User, Role])
+db.create_tables([UserCity])
 
 
 # import hashlib

@@ -19,7 +19,7 @@ def create_app(config_name='default'):
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_server_error)
 
-    db = SqliteDatabase(app.config['DB_NAME'])
+    db = SqliteDatabase(app.config['DB_NAME'], pragmas={'foreign_keys': 1})
     database_proxy.initialize(db)
 
     login_manager.init_app(app)
