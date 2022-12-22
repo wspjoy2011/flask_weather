@@ -48,8 +48,8 @@
             </div>
             <div class="d-flex justify-content-between text-center mt-5 mb-2">
               <div>
-                <p class="mb-2 h5">0</p>
-                <p class="text-muted mb-0">Cities monitoring</p>
+                <p class="mb-2 h5">{{ user.city_user|length }}</p>
+                <p class="text-muted mb-0">Cit{% if user.city_user|length == 1 %}y{% else %}ies{% endif %} monitoring</p>
               </div>
             </div>
           </div>

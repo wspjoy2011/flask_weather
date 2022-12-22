@@ -20,4 +20,6 @@ SURNAMES = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller'
             'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson',
             'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin']
 
+ROLES = ['user', 'admin']
+
 emails_data = EmailData(NAMES, SURNAMES, TOP_LEVEL_DOMAINS, SECOND_LEVEL_DOMAINS)

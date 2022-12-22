@@ -1,48 +1,24 @@
-from random import shuffle, randint, choice
-from typing import NamedTuple, List
+import random
+from typing import List
 
-from generate_data.data import EmailData
-
-
-class EmailNames(NamedTuple):
-    full_name: str
-    email_name: str
+from app.auth.utils import get_avatar
+from generate_data.tools.generate_users import UsersDTO, main as generate_users
+from generate_data.data.user_data import emails_data
+from generate_data.data.profile_data import ProfileDTO, POSITIONS
 
 
-def generate_full_names(data: EmailData):
-    """Generate random full names"""
-    names = data.names
-    surnames = data.surnames
-    shuffle(names)
-    shuffle(surnames)
-    full_names = [f'{name} {surname}' for name, surname in zip(names, surnames)]
-    return full_names
+def generate_profile(users: UsersDTO, positions: List[str]):
+    """Generate profiles"""
+    profiles = []
+    for user in users:
+        avatar = get_avatar(user.email)
+        info = random.choice(positions)
+        profiles.append(ProfileDTO(info, avatar))
+    return profiles
 
 
-def generate_email_names(full_names: List[str]):
-    """Generate nicknames"""
-    email_names = []
-    for full_name in full_names:
-        name, surname = full_name.split(' ')
-        email_name = f'{name.lower()}_{surname.lower()}{randint(1000, 9999)}'
-        email_names.append(EmailNames(full_name, email_name))
-    return email_names
-
-
-def generate_emails(data: EmailData, email_names: List[EmailNames]):
-    """Generate emails"""
-    emails = []
-    top_level_domains = data.top_level_domains
-    second_level_domains = data.second_level_domains
-    for full_name, nickname in email_names:
-        email = f'{nickname}@{choice(second_level_domains)}.{choice(top_level_domains)}'
-        emails.append(EmailNames(full_name, email))
-    return emails
-
-
-def main(data: EmailData):
-    """Main controller"""
-    full_names = generate_full_names(data)
-    email_names = generate_email_names(full_names)
-    emails = generate_emails(data, email_names)
-    return emails
+def main():
+    """Return profiles and users"""
+    users = generate_users(emails_data)
+    profiles = generate_profile(users, POSITIONS)
+    return users, profiles

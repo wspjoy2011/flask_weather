@@ -6,8 +6,8 @@ from flask_login import login_required, current_user
 from app.main import main
 from app.main.forms import NameForm, GenerateDataForm
 from app.auth.models import User
-from generate_data.main import main as generate_data
-from generate_data.data import emails_data
+from generate_data.tools.generate_users import main as generate_data
+from generate_data.data.user_data import emails_data
 from app.main.utils import parse_range_from_paginator
 from app.auth.utils import check_permissions
 
