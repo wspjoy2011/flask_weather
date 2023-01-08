@@ -1,6 +1,7 @@
 import unittest
+
 from flask import url_for
-from random import choice
+from random import choice, sample
 
 from flask_login import login_user, logout_user
 
@@ -11,28 +12,33 @@ from app.auth.models import Role, User
 
 class UsersTestCase(unittest.TestCase):
     """Test users"""
+    ctx = None
+    roles = None
+    profiles = None
+    users = None
+    db = None
+    app = None
+    unittest.TestLoader.sortTestMethodsUsing = None
 
     @classmethod
     def setUpClass(cls):
         """Before all tests"""
+        cls.app = create_app('testing')
+        cls.db = cls.app.config['db']
+        cls.users = USERS
+        cls.profiles = PROFILES
+        cls.roles = ROLES
+        create_db(cls.db, cls.users, cls.profiles, cls.roles)
+        cls.ctx = cls.app.test_request_context()
+        cls.ctx.push()
+        cls.client = cls.app.test_client()
 
-    def setUp(self):
-        """Before each test"""
-        self.app = create_app('testing')
-        self.db = self.app.config['db']
-        self.users = USERS
-        self.profiles = PROFILES
-        self.roles = ROLES
-        create_db(self.db, self.users, self.profiles, self.roles)
-        self.ctx = self.app.test_request_context()
-        self.ctx.push()
-        self.client = self.app.test_client()
-
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         """After each test"""
-        self.ctx.pop()
+        cls.ctx.pop()
 
-    def test_show_users_page(self):
+    def test_1_show_users_page(self):
         """Test user data from show_user page"""
         response_first_page = self.client.get(url_for('main.show_emails'))
         response_second_page = self.client.get(url_for('main.show_emails', page=2))
@@ -46,8 +52,10 @@ class UsersTestCase(unittest.TestCase):
                           f'<td>{user.email}</td>\n                '
                           f'<td>{user.role}</td>\n',
                           data)
+        self.assertEqual(response_first_page.request.path, url_for('main.show_emails'))
+        self.assertEqual(response_second_page.request.path, url_for('main.show_emails'))
 
-    def test_edit_user_page(self):
+    def test_2_edit_user_page(self):
         """Test edit user information"""
         admins = Role.select().where(Role.name == 'admin').first()
         users = User.select()
@@ -60,9 +68,10 @@ class UsersTestCase(unittest.TestCase):
         code = response.status_code
         self.assertEqual(code, 200)
         self.assertIn(random_user.email, data)
+        self.assertEqual(response.request.path, url_for('main.edit_email', user_id=random_user.id))
         logout_user()
 
-    def test_edit_page_with_anonymous_user(self):
+    def test_3_edit_page_with_anonymous_user(self):
         """Test to get edit page with anonymous user"""
         user_to_edit = choice(User.select())
         response = self.client.get(url_for('main.edit_email', user_id=user_to_edit.id), follow_redirects=True)
@@ -72,7 +81,7 @@ class UsersTestCase(unittest.TestCase):
         self.assertIn('Please log in to access this page.', data)
         self.assertEqual(response.request.path, url_for('auth.login'))
 
-    def test_edit_page_another_user_with_user_role(self):
+    def test_4_edit_page_another_user_with_user_role(self):
         """Test edit another user information with user role, access denied"""
         users = Role.select().where(Role.name == 'user').first().users
         user_to_edit = choice(users)
@@ -84,9 +93,10 @@ class UsersTestCase(unittest.TestCase):
         data = response.get_data(as_text=True)
         self.assertEqual(code, 200)
         self.assertIn("You don&#39;t have access to edit this item.", data)
+        self.assertEqual(response.request.path, url_for('main.index'))
         logout_user()
 
-    def test_edit_page_non_existent_user(self):
+    def test_5_edit_page_non_existent_user(self):
         """Test edit page with non-existing user id"""
         admin = choice(Role.select().where(Role.name == 'admin').first().users)
         fake_id = 777
@@ -97,9 +107,10 @@ class UsersTestCase(unittest.TestCase):
         data = response.get_data(as_text=True)
         self.assertEqual(code, 200)
         self.assertIn(f'User with id: {fake_id} not found.', data)
+        self.assertEqual(response.request.path, url_for('main.index'))
         logout_user()
 
-    def test_update_username(self):
+    def test_6_update_username(self):
         """Test update user information"""
         self.app.config['WTF_CSRF_ENABLED'] = False
         admins = Role.select().where(Role.name == 'admin').first()
@@ -122,9 +133,11 @@ class UsersTestCase(unittest.TestCase):
         data = response.get_data(as_text=True)
         self.assertEqual(code, 200)
         self.assertIn(f'{random_user.name}_test updated', data)
+        self.assertEqual(response.request.path, url_for('main.index'))
         logout_user()
+        self.app.config['WTF_CSRF_ENABLED'] = True
 
-    def test_update_user_with_existing_email(self):
+    def test_7_update_user_with_existing_email(self):
         """Test update user information with existing email"""
         self.app.config['WTF_CSRF_ENABLED'] = False
         users = User.select()
@@ -146,7 +159,77 @@ class UsersTestCase(unittest.TestCase):
         data = response.get_data(as_text=True)
         self.assertEqual(code, 200)
         self.assertIn('Email already added into database', data)
+        self.assertEqual(response.request.path, url_for('main.index'))
         logout_user()
+        self.app.config['WTF_CSRF_ENABLED'] = True
+
+    def test_8_delete_users(self):
+        """Test delete users"""
+        self.app.config['WTF_CSRF_ENABLED'] = False
+        admin = choice(Role.select().where(Role.name == 'admin').first().users)
+        random_users = sample(
+            list(
+                Role.select().where(Role.name == 'user').first().users), 3
+        )
+        random_users_emails = 'Deleted: ' + ' '.join([user.email for user in random_users])
+        random_users_idx = [str(user.id) for user in random_users]
+
+        login_user(admin)
+        response = self.client.post(
+            url_for('main.delete_emails'),
+            data={
+                'selectors': random_users_idx,
+            },
+            follow_redirects=True
+        )
+        code = response.status_code
+        data = response.get_data(as_text=True)
+        self.assertEqual(code, 200)
+        self.assertIn(random_users_emails, data)
+        self.assertEqual(response.request.path, url_for('main.show_emails'))
+        logout_user()
+        self.app.config['WTF_CSRF_ENABLED'] = True
+
+    def test_9_delete_users_empty_list(self):
+        """Test delete users"""
+        self.app.config['WTF_CSRF_ENABLED'] = False
+        admin = choice(Role.select().where(Role.name == 'admin').first().users)
+        login_user(admin)
+        response = self.client.post(
+            url_for('main.delete_emails'),
+            data={
+                'selectors': [],
+            },
+            follow_redirects=True
+        )
+        code = response.status_code
+        data = response.get_data(as_text=True)
+        self.assertEqual(code, 200)
+        self.assertIn('Nothing to delete', data)
+        self.assertEqual(response.request.path, url_for('main.show_emails'))
+        logout_user()
+        self.app.config['WTF_CSRF_ENABLED'] = True
+
+    def test_10_delete_user_without_permission(self):
+        """Delete users without permission"""
+        self.app.config['WTF_CSRF_ENABLED'] = False
+        user = choice(Role.select().where(Role.name == 'user').first().users)
+        login_user(user)
+        response = self.client.post(
+            url_for('main.delete_emails'),
+            data={
+                'selectors': [],
+            },
+            follow_redirects=True
+        )
+        code = response.status_code
+        data = response.get_data(as_text=True)
+        self.assertEqual(code, 200)
+        self.assertIn('You don&#39;t have access to delete this users.', data)
+        self.assertEqual(response.request.path, url_for('main.index'))
+
+        logout_user()
+        self.app.config['WTF_CSRF_ENABLED'] = True
 
 
 if __name__ == "__main__":

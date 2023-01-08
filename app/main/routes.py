@@ -32,15 +32,10 @@ def index():
 @main.route('/email/show')
 def show_emails():
     """Show user information"""
-    search = False
-    q = request.args.get('q')
-    if q:
-        search = True
-
     page = request.args.get(get_page_parameter(), type=int, default=1)
 
     users = User.select()
-    pagination = Pagination(page=page, total=users.count(), search=search, record_name='users')
+    pagination = Pagination(page=page, total=users.count(), record_name='users')
     start, stop = parse_range_from_paginator(pagination.info)
     return render_template(
         'main/show_emails.html',
@@ -110,7 +105,7 @@ def delete_emails():
     """Delete selected users"""
     if request.method == 'POST':
         if not check_permissions(current_user):
-            flash('You don\'t have access to edit this item.', 'error')
+            flash('You don\'t have access to delete this users.', 'error')
             return redirect(url_for('main.index'))
 
         message = 'Deleted: '
