@@ -20,11 +20,12 @@ def create_app(config_name='default'):
     app.register_error_handler(500, internal_server_error)
 
     if config_name == 'testing':
-        db = SqliteDatabase(':memory:')
+        db = SqliteDatabase(':memory:', pragmas={'foreign_keys': 1})
     else:
         db = SqliteDatabase(app.config['DB_NAME'], pragmas={'foreign_keys': 1})
 
     database_proxy.initialize(db)
+    app.config['db'] = db
 
     login_manager.init_app(app)
 

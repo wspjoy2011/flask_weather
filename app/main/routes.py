@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, current_app
 from datetime import datetime
 from flask_paginate import Pagination, get_page_parameter
 from flask_login import login_required, current_user
@@ -6,10 +6,9 @@ from flask_login import login_required, current_user
 from app.main import main
 from app.main.forms import NameForm, GenerateDataForm
 from app.auth.models import User
-from generate_data.tools.generate_users import main as generate_data
-from generate_data.data.user_data import emails_data
 from app.main.utils import parse_range_from_paginator
 from app.auth.utils import check_permissions
+from generate_data.db.create_test_database import create_db, USERS, PROFILES, ROLES
 
 
 @main.route('/', methods=['POST', 'GET'])
@@ -18,14 +17,9 @@ def index():
     form = GenerateDataForm()
 
     if form.validate_on_submit():
-        if not User.select():
-            emails = generate_data(emails_data)
-            for name, email in emails:
-                user = User(name=name, email=email)
-                user.save()
-            flash('Database filled with test data')
-        else:
-            flash('Database is not empty')
+        db = current_app.config['db']
+        create_db(db, USERS, PROFILES, ROLES, delete=True)
+        flash('Database filled with test data')
 
     return render_template(
         'index.html',
@@ -65,11 +59,12 @@ def edit_email(user_id):
         return redirect(url_for('main.index'))
 
     user = User.select().where(User.id == user_id).first()
-    form = NameForm()
-    if not user:
-        flash(f'User with id: {user_id} not found. You can add user in this form.')
-        return redirect(url_for('main.add_email'))
 
+    if not user:
+        flash(f'User with id: {user_id} not found.')
+        return redirect(url_for('main.index'))
+
+    form = NameForm()
     form.id.data = user.id
     form.id.label.text = ''
     form.name.label.text = 'Edit this name'
@@ -86,7 +81,8 @@ def edit_email(user_id):
     )
 
 
-@main.route('/email/update', methods=['GET', 'POST'])
+@main.route('/email/update', methods=['POST'])
+@login_required
 def update_email():
     """Update user from form"""
     form = NameForm()
@@ -98,11 +94,12 @@ def update_email():
         user = User.select().where(User.id == user_id).first()
         user.name = user_name
         user.email = user_email
+
         try:
             user.save()
             flash(f'{user_name} updated')
         except Exception:
-            flash(f'Email already added into database')
+            flash('Email already added into database')
 
     return redirect(url_for('main.index'))
 
