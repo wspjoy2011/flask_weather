@@ -1,12 +1,10 @@
-from peewee import SqliteDatabase
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import List, Dict
 
 import web
-from app.base_model import database_proxy
-from app.weather.models import Country
+from app.weather.models import Country, City, UserCity
 from weather.country_codes import read_codes_data_from_json, FILENAME
 
 
@@ -20,11 +18,9 @@ def get_path_to_db():
     return path_to_db
 
 
-def convert_data_from_json_to_db(countries: List[Dict[str, str]], path_to_db: str):
+def convert_data_from_json_to_db(countries: List[Dict[str, str]], db):
     """Convert data from json file to db"""
-    db = SqliteDatabase(path_to_db)
-    database_proxy.initialize(db)
-    db.create_tables([Country])
+    db.create_tables([Country, City, UserCity])
     Country.delete().execute()
 
     for country in countries:
@@ -36,11 +32,10 @@ def convert_data_from_json_to_db(countries: List[Dict[str, str]], path_to_db: st
         country_instance.save()
 
 
-def main(filename: str):
+def main(filename: str, db):
     """Main controller"""
-    path_to_db = get_path_to_db()
     countries = read_codes_data_from_json(filename)
-    convert_data_from_json_to_db(countries, path_to_db)
+    convert_data_from_json_to_db(countries, db)
 
 
-main(FILENAME)
+# main(FILENAME)

@@ -1,8 +1,13 @@
 import os
+from dotenv import load_dotenv
+
+from definitions import PATH_TO_ENV_FILE
+
+load_dotenv(PATH_TO_ENV_FILE)
 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'some_secret_key')
+    SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(32))
     DB_NAME = os.getenv('DATABASE')
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
     UPLOAD_FOLDER = os.path.join('app', 'static', 'img', 'profile')

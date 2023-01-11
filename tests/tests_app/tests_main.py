@@ -2,7 +2,6 @@ import unittest
 
 from flask import url_for
 from random import choice, sample
-
 from flask_login import login_user, logout_user
 
 from app import create_app
@@ -18,7 +17,6 @@ class UsersTestCase(unittest.TestCase):
     users = None
     db = None
     app = None
-    unittest.TestLoader.sortTestMethodsUsing = None
 
     @classmethod
     def setUpClass(cls):

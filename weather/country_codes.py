@@ -51,3 +51,6 @@ def main(url: str):
 
 URL_CODES_JSON = 'https://datahub.io/core/country-list/datapackage.json'
 FILENAME = 'countries_codes.json'
+
+if __name__ == '__main__':
+    main(URL_CODES_JSON)

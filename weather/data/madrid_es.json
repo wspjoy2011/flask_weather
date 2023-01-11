@@ -1,0 +1,43 @@
+{
+    "coord": {
+        "lon": -3.7026,
+        "lat": 40.4165
+    },
+    "weather": [
+        {
+            "id": 800,
+            "main": "Clear",
+            "description": "clear sky",
+            "icon": "01d"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": 10.9,
+        "feels_like": 10,
+        "temp_min": 8.89,
+        "temp_max": 12.68,
+        "pressure": 1028,
+        "humidity": 75
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 3.09,
+        "deg": 200
+    },
+    "clouds": {
+        "all": 0
+    },
+    "dt": 1673368033,
+    "sys": {
+        "type": 2,
+        "id": 2007545,
+        "country": "ES",
+        "sunrise": 1673336247,
+        "sunset": 1673370387
+    },
+    "timezone": 3600,
+    "id": 3117735,
+    "name": "Madrid",
+    "cod": 200
+}
