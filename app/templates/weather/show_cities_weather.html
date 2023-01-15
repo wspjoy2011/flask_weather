@@ -40,7 +40,7 @@
                     </a>
                 </td>
                 <td>
-                    <a href="?country_name={{ user_city.city.country.name }}">
+                    <a href="{{ url_for('weather.show_city', country_name=user_city.city.country.name) }}">
                         {{ user_city.city.country.name }}
                     </a>
                 </td>

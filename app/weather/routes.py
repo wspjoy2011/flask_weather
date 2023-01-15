@@ -54,8 +54,8 @@ def show_city():
         .switch(UserCity)
         .join(City)
         .where(UserCity.user == current_user.id)
+        .order_by(City.name)
     )
-
     country_name = request.args.get('country_name')
     if country_name:
         user_cities = [city for city in user_cities if city.city.country.name == country_name]
@@ -149,7 +149,7 @@ def delete_cities():
             .where(UserCity.user == current_user.id, UserCity.city.in_(selectors)).execute()
         )
 
-        cities_to_delete = City.select().where(City.id.in_(selectors))
+        cities_to_delete = City.select().where(City.id.in_(selectors)).order_by(City.name)
         for city in cities_to_delete:
             message += f'{city.name}, '
         flash(message[:-2])
