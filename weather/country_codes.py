@@ -1,6 +1,9 @@
+import os
 import json
 from datapackage import Package
 from typing import List, Dict
+
+from definitions import PATH_TO_ROOT
 
 
 def get_codes(url: str):
@@ -28,7 +31,7 @@ def prepare_data_to_json(codes: List[List[str]]):
 def write_codes_data_to_json(json_data: List[Dict[str, str]], filename: str = 'countries_codes.json'):
     """Write codes data to json file"""
     with open(filename, 'w') as json_file:
-        json.dump(json_data, json_file)
+        json.dump(json_data, json_file, indent=4)
     return True
 
 
@@ -50,7 +53,11 @@ def main(url: str):
 
 
 URL_CODES_JSON = 'https://datahub.io/core/country-list/datapackage.json'
-FILENAME = 'countries_codes.json'
+FILENAME = os.path.join(
+    PATH_TO_ROOT,
+    'weather',
+    'countries_codes.json'
+)
 
 if __name__ == '__main__':
     main(URL_CODES_JSON)

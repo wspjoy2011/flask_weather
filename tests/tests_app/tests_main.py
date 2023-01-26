@@ -228,7 +228,3 @@ class UsersTestCase(unittest.TestCase):
 
         logout_user()
         self.app.config['WTF_CSRF_ENABLED'] = True
-
-
-if __name__ == "__main__":
-    unittest.main()

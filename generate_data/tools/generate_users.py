@@ -1,6 +1,7 @@
 import random
 import secrets
 import string
+from password_generator import PasswordGenerator
 from random import shuffle, randint, choice
 from typing import NamedTuple, List
 
@@ -38,8 +39,10 @@ def generate_email_names(full_names: List[str]):
 
 def generate_password(pass_len: int = 10):
     """Generate password"""
-    alphabet = string.ascii_letters + string.digits
-    password = ''.join(secrets.choice(alphabet) for _ in range(pass_len))
+    pwo = PasswordGenerator()
+    pwo.minlen = 20
+    pwo.maxlen = 30
+    password = pwo.generate()
     return password
 
 

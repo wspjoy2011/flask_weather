@@ -5,21 +5,20 @@ from flask import url_for
 from flask_login import login_user, logout_user
 from random import choice, sample
 from pathlib import Path
-from collections import Counter
 
 import weather
 from app import create_app
 from generate_data.db.create_test_database import create_db, USERS, PROFILES, ROLES
-from app.auth.models import Role, User
+from app.auth.models import User
 from app.weather.models import Country, UserCity, City
-from weather.getting_weather import main as main_weather, parse_weather_data, read_city_weather_from_json
+from weather.getting_weather import parse_weather_data, read_city_weather_from_json
 from weather.fill_country_db import main as main_fill_weather, FILENAME as countries_json
 
 
 PATH_TO_COUNTRIES_JSON = os.path.join(Path(weather.__file__).parent, countries_json)
 
 
-class UsersTestCase(unittest.TestCase):
+class WeatherTestCase(unittest.TestCase):
     """Test users"""
     ctx = None
     roles = None

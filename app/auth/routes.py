@@ -50,7 +50,10 @@ def register():
     """Register login"""
     form = RegisterForm()
     if form.validate_on_submit():
-        profile = Profile(avatar=get_avatar(form.email.data.lower()))
+        profile = Profile(
+            avatar=get_avatar(form.email.data.lower()),
+            info=form.info.data.title()
+        )
         profile.save()
         user = User(
             email=form.email.data.lower(),
@@ -61,7 +64,7 @@ def register():
         )
         user.save()
 
-        flash('You can now login.')
+        flash(f'{form.username.data.lower()} you can now login.')
         return redirect(url_for('auth.login'))
     return render_template(
         'auth/register.html',
@@ -106,9 +109,14 @@ def show_profile(user_id):
 @auth.route('/profile/upload/avatar/<int:user_id>', methods=['POST'])
 @login_required
 def upload_avatar(user_id):
+    user = User.select().where(User.id == user_id).first()
     if request.method == 'POST':
-        user = User.select().where(User.id == user_id).first()
-        filename = request.files['avatar'].filename
+
+        if user.id != current_user.id:
+            flash('You cannot change avatar of another user')
+            return redirect(url_for('main.index'))
+
+        filename = request.files['avatar'].filename.strip()
         if filename:
             filename = f'{time()}_{secure_filename(filename)}'
             path_to_file = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
@@ -128,7 +136,7 @@ def upload_avatar(user_id):
             flash(f'{filename} uploaded')
             return redirect(url_for('auth.show_profile', user_id=user.id))
 
-    flash('Nothing to upload')
+        flash('Nothing to upload')
     return redirect(url_for('auth.show_profile', user_id=user.id))
 
 
