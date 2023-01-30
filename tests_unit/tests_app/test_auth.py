@@ -1,6 +1,7 @@
 import os
 import re
 import unittest
+import warnings
 import io
 from PIL import Image
 from random import choice
@@ -47,6 +48,8 @@ class UserTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Before all tests"""
+        warnings.filterwarnings(action="ignore", category=ResourceWarning)
+        warnings.filterwarnings(action="ignore", category=DeprecationWarning)
         cls.app = create_app('testing')
         cls.app.config['WTF_CSRF_ENABLED'] = False
 
@@ -66,7 +69,7 @@ class UserTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        """After each test"""
+        """After all test"""
         cls.ctx.pop()
 
     def test_1_register_user(self):

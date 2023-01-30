@@ -21,6 +21,9 @@ def get_path_to_db():
 def convert_data_from_json_to_db(countries: List[Dict[str, str]], db):
     """Convert data from json file to db"""
     db.create_tables([Country, City, UserCity])
+
+    UserCity.delete().execute()
+    City.delete().execute()
     Country.delete().execute()
 
     for country in countries:

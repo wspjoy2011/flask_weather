@@ -41,6 +41,7 @@ def login():
 
     return render_template(
         'auth/login.html',
+        title='Login page',
         form=form
     )
 

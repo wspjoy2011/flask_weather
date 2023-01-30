@@ -31,6 +31,11 @@ def index():
             flash(city_weather['error'])
             return redirect(url_for('weather.index'))
         country = Country.select().where(Country.code == city_weather['country']).first()
+
+        if not country:
+            flash('Country not found')
+            return redirect(url_for('main.index'))
+
         city_weather['country'] = country.name
 
     return render_template(

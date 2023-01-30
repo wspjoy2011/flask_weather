@@ -1,5 +1,5 @@
 import unittest
-
+import warnings
 from flask import url_for
 from random import choice, sample
 from flask_login import login_user, logout_user
@@ -21,6 +21,8 @@ class UsersTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Before all tests"""
+        warnings.filterwarnings(action="ignore", category=ResourceWarning)
+        warnings.filterwarnings(action="ignore", category=DeprecationWarning)
         cls.app = create_app('testing')
         cls.db = cls.app.config['db']
         cls.users = USERS

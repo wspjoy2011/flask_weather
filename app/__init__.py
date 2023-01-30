@@ -9,6 +9,11 @@ from app.error_handlers import page_not_found, internal_server_error
 from app.base_model import database_proxy
 from app.auth.utils import login_manager
 from app.api.weather.cities import init_app as init_app_cities
+from app.api.weather.city import init_app as init_app_city
+from app.api.weather.countries import init_app as init_app_countries
+from app.api.weather.country import init_app as init_app_country
+from app.auth.models import User, Role, Profile
+from app.weather.models import Country, City, UserCity
 
 
 def create_app(config_name='default'):
@@ -25,6 +30,8 @@ def create_app(config_name='default'):
         db = SqliteDatabase(app.config['DB_NAME'], pragmas={'foreign_keys': 1})
 
     database_proxy.initialize(db)
+    db.create_tables([Role, Profile, User, Country, City, UserCity])
+
     app.config['db'] = db
 
     login_manager.init_app(app)
@@ -34,6 +41,9 @@ def create_app(config_name='default'):
     app.config['CSRF'] = csrf
 
     init_app_cities(app)
+    init_app_city(app)
+    init_app_countries(app)
+    init_app_country(app)
 
     Bootstrap(app)
 

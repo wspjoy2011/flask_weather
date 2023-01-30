@@ -9,6 +9,7 @@ from app.auth.models import User
 from app.main.utils import parse_range_from_paginator
 from app.auth.utils import check_permissions
 from generate_data.db.create_test_database import create_db, USERS, PROFILES, ROLES
+from weather.fill_country_db import main as fill_country_db, FILENAME as COUNTRY_JSON_FILE
 
 
 @main.route('/', methods=['POST', 'GET'])
@@ -19,6 +20,7 @@ def index():
     if form.validate_on_submit():
         db = current_app.config['db']
         create_db(db, USERS, PROFILES, ROLES, delete=True)
+        fill_country_db(COUNTRY_JSON_FILE, db)
         flash('Database filled with test data')
 
     return render_template(

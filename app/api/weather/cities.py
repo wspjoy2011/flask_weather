@@ -1,3 +1,4 @@
+import peewee
 from flask_restful import Api, Resource, reqparse
 from flask import make_response, jsonify
 from flask import current_app
@@ -12,7 +13,7 @@ from weather.getting_weather import main as getting_weather
 # DELETE = delete_all_cities 204
 
 
-class Cities(Resource):
+class CitiesAPI(Resource):
     """API for cities"""
     def __init__(self):
         self.cities = None
@@ -86,7 +87,12 @@ class Cities(Resource):
 
     def delete(self):
         """HTTP method DELETE"""
-        City.delete().execute()
+        try:
+            City.delete().execute()
+        except peewee.IntegrityError:
+            message = {'error': f'Cannot delete these cities, '
+                                f'because another users has relation'}
+            return make_response(jsonify(message), 500)
         return make_response('', 204)
 
     def prepare_cities_to_json(self):
@@ -105,4 +111,4 @@ class Cities(Resource):
 def init_app(app):
     with app.app_context():
         api = Api(app, decorators=[current_app.config['CSRF'].exempt])
-        api.add_resource(Cities, '/api/v1/cities/')
+        api.add_resource(CitiesAPI, '/api/v1/cities/')
