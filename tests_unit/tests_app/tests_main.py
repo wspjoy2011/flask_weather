@@ -125,6 +125,7 @@ class UsersTestCase(unittest.TestCase):
                 'id': random_user.id,
                 'name': random_user.name + '_test',
                 'email': random_user.email,
+                'role': random_user.role.id,
                 'submit': 'Add'
             },
             follow_redirects=True
@@ -151,6 +152,7 @@ class UsersTestCase(unittest.TestCase):
                 'id': current_user.id,
                 'name': current_user.name,
                 'email': test_user.email,
+                'role': current_user.role.id,
                 'submit': 'Add'
             },
             follow_redirects=True

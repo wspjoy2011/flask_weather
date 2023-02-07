@@ -1,0 +1,40 @@
+{% extends '_base.html' %}
+
+{% block title %}
+  {{ title }}
+{% endblock title %}
+
+{% block page_content %}
+
+{% include 'messages.html' %}
+
+<h1>Personal blog {{ user.name }}</h1>
+{% if current_user.id != user.id %}
+    {% if not current_user.is_following(user) %}
+        <a href="{{ url_for('blog.follow', username=user.name) }}" class="btn btn-primary">Follow</a>
+    {% else %}
+        <a href="{{ url_for('blog.unfollow', username=user.name) }}" class="btn btn-danger">Unfollow</a>
+    {% endif %}
+{% else %}
+    <strong>Your own blog</strong>
+{% endif %}
+
+<a href="{{ url_for('blog.followers', username=user.name) }}">
+    Followers: <span class="badge">{{ followers_count }}</span>
+</a>
+<a href="{{ url_for('blog.followed', username=user.name) }}">
+    Following: <span class="badge">{{ followed_count }}</span>
+</a>
+
+{% if user.is_following(current_user) %}
+    <span class="label label-default">Follows you</span>
+{% endif %}
+<hr>
+<div class="col-md-10">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+
+{% include 'blog/_blogs.html' %}
+
+{% endblock page_content %}

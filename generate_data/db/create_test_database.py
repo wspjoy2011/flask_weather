@@ -3,6 +3,7 @@ from typing import List, Dict
 
 from app.auth.models import User, Profile, Role
 from app.weather.models import UserCity
+from app.blog.models import Post
 from generate_data.main import main as generate_users_profiles
 from generate_data.data.user_data import ROLES
 from generate_data.tools.generate_users import UsersDTO
@@ -11,6 +12,7 @@ from generate_data.tools.generate_users import UsersDTO
 def clear_db():
     """Delete data from User, Profile, Role tables"""
     UserCity().delete().execute()
+    Post.delete().execute()
     User.delete().execute()
     Role.delete().execute()
     Profile.delete().execute()

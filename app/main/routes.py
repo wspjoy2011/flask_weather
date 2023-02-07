@@ -5,7 +5,7 @@ from flask_login import login_required, current_user
 
 from app.main import main
 from app.main.forms import NameForm, GenerateDataForm
-from app.auth.models import User
+from app.auth.models import User, Role
 from app.main.utils import parse_range_from_paginator
 from app.auth.utils import check_permissions
 from generate_data.db.create_test_database import create_db, USERS, PROFILES, ROLES
@@ -56,21 +56,19 @@ def edit_email(user_id):
         return redirect(url_for('main.index'))
 
     user = User.select().where(User.id == user_id).first()
-
     if not user:
         flash(f'User with id: {user_id} not found.')
         return redirect(url_for('main.index'))
 
     form = NameForm()
-    form.id.data = user.id
     form.id.label.text = ''
-    form.name.label.text = 'Edit this name'
-    form.email.label.text = 'Edit this email'
-
+    form.id.data = user.id
     form.name.data = user.name
     form.email.data = user.email
-    form.submit.label.text = 'Edit'
-
+    form.role.choices = [(role.id, role.name) for role in Role.select()]
+    form.role.choices = [(role_id, role_name) for role_id, role_name in form.role.choices
+                         if role_id != user.role.id]
+    form.role.choices.insert(0, (user.role.id, user.role.name))
     return render_template(
         'main/edit_email.html',
         title=f'Edit user {user.name}',
@@ -83,21 +81,27 @@ def edit_email(user_id):
 def update_email():
     """Update user from form"""
     form = NameForm()
+    form.role.choices = [(role.id, role.name) for role in Role.select()]
     if form.validate_on_submit():
         user_id = form.id.data
         user_name = form.name.data
         user_email = form.email.data
+        user_role_id = form.role.data
 
+        role = Role.select().where(Role.id == user_role_id).first()
         user = User.select().where(User.id == user_id).first()
+
         user.name = user_name
         user.email = user_email
+        user.role = role
 
         try:
             user.save()
             flash(f'{user_name} updated')
         except Exception:
             flash('Email already added into database')
-
+    else:
+        flash(form.errors)
     return redirect(url_for('main.index'))
 
 

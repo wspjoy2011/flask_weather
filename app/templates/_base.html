@@ -6,6 +6,7 @@
         type="image/x-icon">
     <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}"
         type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css">
 {% endblock %}
 
@@ -25,6 +26,7 @@
 {% block scripts %}
 {{ super() }}
     {{ moment.include_moment() }}
+    {{ pagedown.include_pagedown() }}
     <script src="https://cdn.jsdelivr.net/npm/@mojs/core"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/links.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/select.js') }}"></script>

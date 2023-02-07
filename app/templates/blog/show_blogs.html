@@ -1,0 +1,36 @@
+{% extends '_base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+  {{ title }}
+{% endblock title %}
+
+{% block page_content %}
+
+{% include 'messages.html' %}
+
+<div>
+    <form action="{{ url_for('blog.index') }}" method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="col-md-5">
+            {{ wtf.form_field(form.image) }}
+        </div>
+        <div class="col-md-8">
+            {{ wtf.form_field(form.body) }}
+            {{ wtf.form_field(form.submit) }}
+        </div>
+    </form>
+</div>
+<hr>
+<div class="col-md-10">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+<div class="col-md-10 post-tabs">
+    <ul class="nav nav-tabs">
+        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('blog.show_all') }}">All</a></li>
+        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('blog.show_followed') }}">Followed</a></li>
+    </ul>
+{% include 'blog/_blogs.html' %}
+</div>
+{% endblock page_content %}

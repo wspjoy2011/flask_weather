@@ -119,8 +119,8 @@ def upload_avatar(user_id):
 
         filename = request.files['avatar'].filename.strip()
         if filename:
-            filename = f'{time()}_{secure_filename(filename)}'
-            path_to_file = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+            filename = f'{round(time())}_{secure_filename(filename)}'
+            path_to_file = os.path.join(current_app.config['UPLOAD_FOLDER_PROFILE'], filename)
             request.files['avatar'].save(path_to_file)
             image_type = imghdr.what(path_to_file)
 
@@ -129,7 +129,7 @@ def upload_avatar(user_id):
                 flash(f'{filename} is not allowed image type')
                 return redirect(url_for('auth.show_profile', user_id=user.id))
 
-            url_to_avatar = current_app.config['UPLOAD_URL'] + filename
+            url_to_avatar = current_app.config['UPLOAD_URL_PROFILE'] + filename
             profile = Profile.select().where(Profile.id == user.profile.id).first()
             profile.avatar = url_to_avatar
             profile.save()

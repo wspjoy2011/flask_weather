@@ -13,6 +13,7 @@ from app.weather import weather
 from app.weather.forms import CityForm
 from weather.getting_weather import main as getting_weather
 from app.weather.models import Country, City, User, UserCity
+from app.weather.utils import get_location
 
 
 @weather.route('/', methods=['GET', 'POST'])
@@ -22,6 +23,7 @@ def index():
     city_weather = None
     country = None
     city_name = None
+    current_location = get_location()
 
     if form.validate_on_submit():
         api_key = current_app.config['WEATHER_API_KEY']
@@ -44,7 +46,8 @@ def index():
         form=form,
         city_name=city_name,
         country=country,
-        city_weather=city_weather
+        city_weather=city_weather,
+        location=current_location
     )
 
 

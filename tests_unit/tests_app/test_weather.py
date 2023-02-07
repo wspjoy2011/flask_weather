@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from flask import url_for
 from flask_login import login_user, logout_user
-from random import choice, sample
+from random import choice, shuffle
 from pathlib import Path
 
 import weather
@@ -98,10 +98,12 @@ class WeatherTestCase(unittest.TestCase):
 
     def test_3_weather_add_city_to_user(self):
         """Add city weather into database"""
-        random_user = choice(list(User.select()))
+        random_user = choice([user for user in User.select() if user.id != self.user.id])
 
         login_user(random_user)
-        random_cities = sample(list(self.cities.keys()), 3)
+        cities = list(self.cities.keys())
+        shuffle(cities)
+        random_cities = cities[-3:]
         for city_country_code in random_cities:
             city_name, country_code = city_country_code.split('_')
             country_id = Country.select().where(Country.code == country_code.upper()).first()
@@ -116,6 +118,7 @@ class WeatherTestCase(unittest.TestCase):
             code = response.status_code
             data = response.get_data(as_text=True)
             self.assertEqual(code, 200)
+
             self.assertIn(f'City: {city_name.capitalize()} added to list of user {random_user.name}', data)
             self.assertEqual(response.request.path, url_for('weather.index'))
         logout_user()
@@ -146,7 +149,8 @@ class WeatherTestCase(unittest.TestCase):
     def test_5_weather_delete_cities_from_user(self):
         """Delete cities from user"""
         users_cities = UserCity.select()
-        random_user_cities = sample(list(users_cities), k=2)
+        shuffle(list(users_cities))
+        random_user_cities = users_cities[-2:]
         user = User.select().where(User.id == random_user_cities[0].user_id).first()
         cities_idx = [user_city.city_id for user_city in random_user_cities]
         cities_names = []

@@ -1,0 +1,26 @@
+{% extends '_base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}
+  {{ title }}
+{% endblock title %}
+
+{% block page_content %}
+
+{% include 'messages.html' %}
+
+<h1>Edit post by id {{ author }}</h1>
+
+<div>
+    <form action="{{ url_for('blog.edit', post_id=post.id) }}" method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="col-md-5">
+            {{ wtf.form_field(form.image) }}
+        </div>
+        <div class="col-md-8">
+            {{ wtf.form_field(form.body) }}
+            {{ wtf.form_field(form.submit) }}
+        </div>
+    </form>
+</div>
+{% endblock page_content %}

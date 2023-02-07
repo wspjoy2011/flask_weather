@@ -1,15 +1,33 @@
 {% extends '_base.html' %}
 {% import "bootstrap/wtf.html" as wtf %}
 
+{% block head %}
+{{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/weather.css') }}" type="text/css">
+{% endblock %}
+
+
 {% block title %}
   {{ title }}
 {% endblock title %}
 
 {% block page_content %}
 <div class="page-header">
-    <h1>Show weather info</h1>
+    <h1>
+        Show weather info about
+        <br>
+        <strong>{{ location.city }}, {{ location.country }}</strong>
+    </h1>
+    <div id="weatherContainer">
+        <marquee id="cityName"></marquee>
+        <span id="temp"></span>
+        <span id="main"></span>
+        <marquee id="description"></marquee>
+        <img id="image" src="">
+    </div>
 </div>
 {% include 'messages.html' %}
+
 <div class="col-md-4">
     <form action="{{ url_for('weather.index') }}" method="POST">
         {{ form.csrf_token }}
@@ -48,6 +66,17 @@
         </form>
 </div>
 </div>
+<div class="col-md-5">
+   <div class="gmap_canvas">
+     <iframe width="400" height="300" id="gmap_canvas"
+             src="https://maps.google.com/maps?q={{ city_name }}&t=&z=9&ie=UTF8&iwloc=&output=embed">
+     </iframe>
+   </div>
+ </div>
 {% endif %}
-
 {% endblock page_content %}
+
+{% block scripts %}
+{{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/get_weather.js') }}"></script>
+{% endblock %}

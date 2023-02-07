@@ -453,7 +453,7 @@ class UserTestCase(unittest.TestCase):
         data = response.get_data(as_text=True)
         url = response.request.path
         self.assertEqual(code, 200)
-        self.assertTrue(re.search(rf'[0-9]+\.[0-9]+_{image_name}\suploaded', data))
+        self.assertTrue(re.search(rf'[0-9]+_{image_name}\suploaded', data))
         self.assertEqual(url, url_for('auth.show_profile', user_id=user.id))
         logout_user()
 

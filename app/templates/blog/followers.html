@@ -1,0 +1,38 @@
+{% extends '_base.html' %}
+
+{% block title %}
+  {{ title }}
+{% endblock title %}
+
+{% block page_content %}
+
+<div class="page-header">
+    <h1>{{ title }}</h1>
+</div>
+
+<div class="col-md-5 ">
+    <table class="table table-hover followers">
+        <thead>
+        <tr>
+            <th>User</th>
+            <th>Since</th>
+        </tr>
+        </thead>
+        {% for follow in follows %}
+        <tr>
+            <td>
+                <a href="{{ url_for('blog.user_blog', username = follow.user.name) }}">
+                    <img class="img-rounded" width="25" height="25" src="{{ follow.user.profile.avatar }}">
+                    <strong>{{ follow.user.name }}</strong>
+                </a>
+            </td>
+            <td>{{ moment(follow.timestamp).fromNow() }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<div class="col-md-10">
+    {{ pagination.info }}
+    {{ pagination.links }}
+</div>
+{% endblock %}

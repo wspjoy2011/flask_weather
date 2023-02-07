@@ -1,16 +1,15 @@
 import os
-from pathlib import Path
 from dotenv import load_dotenv
 from typing import List, Dict
 
-import web
+from definitions import PATH_TO_ROOT
 from app.weather.models import Country, City, UserCity
 from weather.country_codes import read_codes_data_from_json, FILENAME
 
 
 def get_path_to_db():
     """Get path to database"""
-    path_to_base_dir = Path(web.__file__).parent
+    path_to_base_dir = PATH_TO_ROOT
     path_to_env_file = os.path.join(path_to_base_dir, '.flaskenv')
     load_dotenv(path_to_env_file)
     db_name = os.environ.get('DATABASE')

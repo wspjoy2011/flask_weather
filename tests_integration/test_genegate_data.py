@@ -1,3 +1,5 @@
+import os
+import pathlib
 import json
 import random
 import time
@@ -6,7 +8,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from typing import Dict
 
+
 from definitions import PATH_TO_CREDENTIALS
+from tests_integration import images
 
 
 class TestGenerateDB(unittest.TestCase):
@@ -61,6 +65,21 @@ class TestGenerateDB(unittest.TestCase):
         self.browser.find_element(By.ID, 'addCity').click()
         alert_text = self.browser.find_element(By.ID, 'alert_block').text
         self.assertIn(f'City: Tokyo added to list of user {self.random_user["nickname"]}', alert_text)
+
+    def test_ad_check_profile_count_added_cities(self):
+        self.browser.find_element(By.ID, 'linkProfile').click()
+        city_count = self.browser.find_element(By.ID, 'countCity').text
+        self.assertEqual(1, int(city_count))
+
+        image_name = 'cat_example.jpg'
+        path_to_image = os.path.join(pathlib.Path(images.__file__).parent, image_name)
+        self.browser.find_element(By.NAME, 'avatar').send_keys(path_to_image)
+        self.browser.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        alert_text = self.browser.find_element(By.ID, 'alert_block').text
+        self.assertIn(f'{image_name} uploaded', alert_text)
+        image_src = self.browser.find_element(By.ID, 'avatar').get_attribute('src')
+        self.assertTrue(image_src.endswith(image_name))
+
         time.sleep(5)
 
     @classmethod

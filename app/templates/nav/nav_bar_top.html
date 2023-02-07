@@ -1,5 +1,5 @@
 <nav class="navbar navbar-inverse">
-  <div class="container">
+    <div class="container">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
@@ -32,10 +32,20 @@
           </ul>
         </li>
       </ul>
+        <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  Blog <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                  <li><a href="{{ url_for('blog.index') }}">Posts</a></li>
+                  <li role="separator" class="divider"></li>
+              </ul>
+            </li>
+        </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if current_user.is_authenticated %}
             <li>
-                <a href="{{ url_for('auth.show_profile', user_id=current_user.id) }}">
+                <a id="linkProfile" href="{{ url_for('auth.show_profile', user_id=current_user.id) }}">
                     <img src="{{ current_user.profile.avatar }}" alt="avatar" width="20" height="20">
                     {{ current_user.name }}
                 </a>

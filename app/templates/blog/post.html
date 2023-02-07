@@ -1,0 +1,15 @@
+{% extends '_base.html' %}
+
+{% block title %}
+  {{ title }}
+{% endblock title %}
+
+{% block page_content %}
+
+{% include 'messages.html' %}
+
+<h1>Post by user {{ author }}</h1>
+
+{% include 'blog/_blogs.html' %}
+
+{% endblock page_content %}
