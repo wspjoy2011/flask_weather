@@ -15,3 +15,12 @@ class PostForm(FlaskForm):
         'Add',
         render_kw={'id': 'addImage'}
     )
+
+
+class CommentForm(FlaskForm):
+    body = PageDownField(
+        'Comment',
+        validators=[DataRequired()],
+        render_kw={'rows': '3'}
+    )
+    submit = SubmitField('Add comment')

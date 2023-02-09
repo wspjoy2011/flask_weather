@@ -1,4 +1,5 @@
 {% extends '_base.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}
   {{ title }}
@@ -11,5 +12,12 @@
 <h1>Post by user {{ author }}</h1>
 
 {% include 'blog/_blogs.html' %}
-
+<form class="col-md-8 comment-form" action="{{ url_for('blog.post', post_id=posts[0].id) }}" method="POST">
+        {{ form.csrf_token }}
+        {{ wtf.form_field(form.body) }}
+        {{ wtf.form_field(form.submit) }}
+</form>
+<div class="col-md-8">
+    {% include 'blog/_comments.html' %}
+</div>
 {% endblock page_content %}

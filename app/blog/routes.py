@@ -7,8 +7,8 @@ from flask_login import login_required, current_user
 from flask import render_template, flash, redirect, url_for, request, current_app, abort, make_response
 
 from app.blog import blog
-from app.blog.models import Post
-from app.blog.forms import PostForm
+from app.blog.models import Post, Comment
+from app.blog.forms import PostForm, CommentForm
 from app.auth.models import User
 from app.main.utils import parse_range_from_paginator
 from app.auth.utils import check_permissions
@@ -97,16 +97,33 @@ def user_blog(username):
         pagination=pagination)
 
 
-@blog.route('/post/<int:post_id>')
+@blog.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post(post_id):
     post = Post.select().where(Post.id == post_id).first()
+    comments = post.comments
     if not post:
         abort(404)
+
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comment(
+            body=form.body.data,
+            author=current_user,
+            post=post,
+            disabled=False
+        )
+        comment.save()
+        flash('You comment has been published')
+        return redirect(url_for('.post', post_id=post_id))
+    moderate = current_user.is_admin()
     return render_template(
         'blog/post.html',
         title=f'Post by {post.author.name}',
         author=post.author.name,
-        posts=[post])
+        posts=[post],
+        comments=comments,
+        moderate=moderate,
+        form=form)
 
 
 @blog.route('/post/edit/<int:post_id>', methods=['GET', 'POST'])
@@ -116,8 +133,7 @@ def edit(post_id):
     if not post:
         abort(404)
 
-    if current_user.id != post.author.id or \
-            not check_permissions(current_user.id):
+    if current_user.id != post.author.id and not current_user.is_admin():
         abort(403)
 
     form = PostForm()
@@ -216,3 +232,25 @@ def followed(username: str):
         follows=follows[start:stop],
         pagination=pagination
     )
+
+
+@blog.route('/moderate/enable/<int:comment_id>')
+@login_required
+def moderate_enable(comment_id):
+    comment = Comment.select().where(Comment.id == comment_id).first()
+    if not comment:
+        abort(404)
+    comment.disabled = False
+    comment.save()
+    return redirect(url_for('.post', post_id=comment.post.id))
+
+
+@blog.route('/moderate/disable/<int:comment_id>')
+@login_required
+def moderate_disable(comment_id):
+    comment = Comment.select().where(Comment.id == comment_id).first()
+    if not comment:
+        abort(404)
+    comment.disabled = True
+    comment.save()
+    return redirect(url_for('.post', post_id=comment.post.id))

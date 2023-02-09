@@ -4,11 +4,11 @@ import unittest
 import warnings
 import io
 from PIL import Image
+from peewee import fn
 from random import choice
 from flask import url_for
 from flask_login import login_user, logout_user
 from werkzeug.security import generate_password_hash
-from peewee import fn
 
 from app import create_app
 from generate_data.db.create_test_database import USERS, PROFILES, ROLES

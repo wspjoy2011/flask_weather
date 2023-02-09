@@ -15,7 +15,7 @@ from app.api.weather.countries import init_app as init_app_countries
 from app.api.weather.country import init_app as init_app_country
 from app.auth.models import User, Role, Profile, Follow
 from app.weather.models import Country, City, UserCity
-from app.blog.models import Post
+from app.blog.models import Post, Comment
 
 
 def create_app(config_name='default'):
@@ -33,7 +33,7 @@ def create_app(config_name='default'):
 
     database_proxy.initialize(db)
     db.create_tables(
-        [Role, Profile, User, Country, City, UserCity, Post, Follow]
+        [Role, Profile, User, Country, City, UserCity, Post, Follow, Comment]
     )
 
     app.config['db'] = db

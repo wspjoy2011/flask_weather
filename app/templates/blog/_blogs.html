@@ -24,11 +24,20 @@
                     {% endif %}
                 </div>
                 <div class="post-footer">
+                    {% if current_user == post.author %}
                     <a href="{{ url_for('blog.edit', post_id=post.id) }}">
                         <span class="label label-primary">Edit</span>
                     </a>
+                    {% elif current_user.is_admin() %}
+                    <a href="{{ url_for('blog.edit', post_id=post.id) }}">
+                        <span class="label label-danger">Edit [Admin]</span>
+                    </a>
+                    {% endif %}
                     <a href="{{ url_for('blog.post', post_id=post.id) }}">
                         <span class="label label-default">Permalink</span>
+                    </a>
+                    <a href="{{ url_for('blog.post', post_id=post.id) }}#comments">
+                        <span class="label label-primary">{{ post.comments.count() }} Comments</span>
                     </a>
                 </div>
             </div>

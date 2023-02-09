@@ -35,6 +35,11 @@ class User(BaseModel, UserMixin):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def is_admin(self):
+        if self.role.name == 'admin':
+            return True
+        return False
+
     def is_following(self, user):
         followed = (
             Follow
