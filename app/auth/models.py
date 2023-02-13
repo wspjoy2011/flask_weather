@@ -1,5 +1,8 @@
 import datetime
 import itertools
+import jwt
+from jwt.exceptions import ExpiredSignatureError
+from flask import current_app
 from peewee import CharField, ForeignKeyField, TextField, DateTimeField
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -39,6 +42,26 @@ class User(BaseModel, UserMixin):
         if self.role.name == 'admin':
             return True
         return False
+
+    def generate_auth_token(self, expiration=3600):
+        token = jwt.encode(
+            {'id': self.id,
+             'exp': datetime.datetime.now().timestamp() + datetime.timedelta(seconds=expiration).seconds},
+            current_app.config['SECRET_KEY'],
+            algorithm="HS256")
+        return token
+
+    @staticmethod
+    def verify_auth_token(token):
+        try:
+            token_data = jwt.decode(
+                token,
+                current_app.config['SECRET_KEY'],
+                algorithms=["HS256"]
+            )
+        except ExpiredSignatureError:
+            return None
+        return User.select().where(User.id == int(token_data['id'])).first()
 
     def is_following(self, user):
         followed = (

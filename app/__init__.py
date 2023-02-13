@@ -6,7 +6,7 @@ from peewee import SqliteDatabase
 from flask_pagedown import PageDown
 
 from app.config import config
-from app.error_handlers import page_not_found, internal_server_error
+from app.error_handlers import page_not_found, internal_server_error, forbidden
 from app.base_model import database_proxy
 from app.auth.utils import login_manager
 from app.api.weather.cities import init_app as init_app_cities
@@ -23,6 +23,7 @@ def create_app(config_name='default'):
     app.static_folder = 'static'
     app.config.from_object(config[config_name])
 
+    app.register_error_handler(403, forbidden)
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_server_error)
 
@@ -61,10 +62,13 @@ def create_app(config_name='default'):
     from app import weather
     from app import auth
     from app import blog
+    from app import api_blog
 
+    csrf.exempt(api_blog.api_blog)
     app.register_blueprint(main.main)
     app.register_blueprint(weather.weather)
     app.register_blueprint(auth.auth)
     app.register_blueprint(blog.blog)
+    app.register_blueprint(api_blog.api_blog)
 
     return app

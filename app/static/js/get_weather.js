@@ -16,7 +16,7 @@ function getIP()  {
       getLocation(data.ip)
     }
   }
-};
+}
 
 function getLocation(ip) {
   const request = new XMLHttpRequest();
@@ -30,7 +30,7 @@ function getLocation(ip) {
       weatherUpdate(data.city)
     }
   }
-};
+}
 
 
 weatherUpdate = (city) => {
@@ -51,8 +51,8 @@ weatherUpdate = (city) => {
       description.innerHTML = data.weather[0].description;
       image.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
     }
-  };
-};
+  }
+}
 
 getIP();
 
